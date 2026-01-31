@@ -10,15 +10,15 @@ struct PasswordEntry
     std::string credential;
     std::string password;
 
-    PasswordEntry(std::string_view s, std::string_view c, std::string_view p)
+    PasswordEntry(std::string_view s = "void", std::string_view c = "void", std::string_view p = "void")
         : source{ s }
         , credential{ c }
         , password{ p }
     {}
 
-    friend std::ostream& operator<<(std::ostream& out, PasswordEntry& p)
+    friend std::ostream& operator<<(std::ostream& out, const PasswordEntry& p)
     {
-        out << "| Source: " << p.source << " | Credential: " << p.credential << " | Password: " << p.password << " |";
+        out << "| Source: " << p.source << "\t| Credential: " << p.credential << "\t| Password: " << p.password << "\t|";
 
         return out;
     }

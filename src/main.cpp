@@ -33,6 +33,7 @@ int main()
                 std::cerr << "Failed to create a file\n";
                 return 1;
             }
+            f << "source,credential,password\n";
         }
         else 
         {
@@ -51,6 +52,7 @@ int main()
                 std::cerr << "Failed to create a file\n";
                 return 1;
             }
+            f << "source,credential,password\n";
             std::cout << "File created\n";
         }
         else
@@ -59,9 +61,7 @@ int main()
         }
     }
 
-    std::vector<PasswordEntry> passVector{};
-
-    Vault myVault{ passVector, "masterpass" };
+    Vault myVault{ "masterpass", file };
 
     myVault.addEntry("gubzywubzy.com", "Gurvir", "password");
     myVault.viewAllEntries();

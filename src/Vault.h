@@ -3,8 +3,12 @@
 
 #include "PasswordEntry.h"
 
+#include <filesystem>
+#include <fstream>
 #include <string_view>
 #include <vector>
+
+namespace fs = std::filesystem;
 
 class Vault 
 {
@@ -13,11 +17,14 @@ class Vault
         std::string m_masterPassword{};
 
     public:
-        Vault(const std::vector<PasswordEntry>& vault, std::string_view masterPassword);
+        Vault(std::string_view masterPassword, const fs::path& filePath);
 
     void addEntry(std::string_view source, std::string_view credential, std::string_view password);
 
     void viewAllEntries() const;
+
+    private:
+    void loadFile(const fs::path& filePath);
 };
 
 #endif 
