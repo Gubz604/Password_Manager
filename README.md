@@ -6,19 +6,19 @@ A secure, lightweight **console-based password manager written in modern C++** t
 
 ## ✨ Features
 
-- 🔑 **Master Password Authentication**  
+🔑 **Master Password Authentication**  
   Protects access to the vault using a user-defined master password
 
-- 🗃️ **Encrypted Local Storage**  
+🗃️ **Encrypted Local Storage**  
   Credentials are saved to disk in encrypted form
 
-- ➕ **Add, View, Search & Delete Entries**  
+➕ **Add, View, Search & Delete Entries**  
   Manage website and service credentials through a simple menu interface
 
-- 💾 **Persistent Vault**  
+💾 **Persistent Vault**  
   Automatically loads saved data when the program starts
 
-- 🔍 **Search Functionality**  
+🔍 **Search Functionality**  
   Find credentials quickly by site name
 
 ---
