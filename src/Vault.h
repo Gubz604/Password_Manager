@@ -15,6 +15,7 @@ class Vault
     private:
         std::vector<PasswordEntry> m_vault{};
         std::string m_masterPassword{};
+        const fs::path& m_filePath{};
 
     public:
         Vault(std::string_view masterPassword, const fs::path& filePath);
@@ -22,6 +23,8 @@ class Vault
     void addEntry(std::string_view source, std::string_view credential, std::string_view password);
 
     void viewAllEntries() const;
+
+    void saveToFile() const;
 
     private:
     void loadFile(const fs::path& filePath);

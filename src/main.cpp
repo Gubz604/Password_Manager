@@ -64,5 +64,8 @@ int main()
     Vault myVault{ "masterpass", file };
 
     myVault.addEntry("gubzywubzy.com", "Gurvir", "password");
+    myVault.addEntry("poolhouse.com", "gubz", "pass1");
     myVault.viewAllEntries();
+
+    myVault.saveToFile();
 }

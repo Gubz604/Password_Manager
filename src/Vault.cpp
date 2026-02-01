@@ -7,8 +7,9 @@ namespace fs = std::filesystem;
 Vault::Vault(std::string_view masterPassword, const fs::path& filePath)
     : m_vault{}
     , m_masterPassword{ masterPassword }
+    , m_filePath{ filePath }
 {
-    loadFile(filePath);
+    loadFile(m_filePath);
 }
 
 void Vault::addEntry(std::string_view source, std::string_view credential, std::string_view password)
@@ -21,6 +22,16 @@ void Vault::viewAllEntries() const
     for(const PasswordEntry& p : m_vault)
     {
         std::cout << p << "\n";
+    }
+}
+
+void Vault::saveToFile() const
+{
+    std::ofstream file(m_filePath);
+    file << "source,credential,password\n";
+    for (const PasswordEntry& p : m_vault) 
+    {
+        file << p.source << "," << p.credential << "," << p.password << "\n";
     }
 }
 
@@ -54,4 +65,5 @@ void Vault::loadFile(const fs::path& filePath)
 
         m_vault.emplace_back(source, credential, password);
     }
+    file.close();
 }
