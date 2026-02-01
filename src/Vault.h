@@ -24,7 +24,7 @@ class Vault
 
     void viewAllEntries() const;
 
-    bool searchPassword(std::string_view source) const;
+    bool searchSource(std::string_view source) const;
 
     void saveToFile() const;
 

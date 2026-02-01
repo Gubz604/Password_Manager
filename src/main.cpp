@@ -68,8 +68,8 @@ int main()
     myVault.viewAllEntries();
 
     std::cout << "\n\n";
-    myVault.searchPassword("gubzywubzy.com");
-    myVault.searchPassword("LosPollosHermanos.com");
+    myVault.searchSource("gubzywubzy.com");
+    myVault.searchSource("LosPollosHermanos.com");
 
     myVault.saveToFile();
 }

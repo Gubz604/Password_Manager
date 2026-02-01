@@ -15,7 +15,10 @@ Vault::Vault(std::string_view masterPassword, const fs::path& filePath)
 
 void Vault::addEntry(std::string_view source, std::string_view credential, std::string_view password)
 {
-    m_vault.emplace_back(source, credential, password);
+    if (!searchSource(source))
+        m_vault.emplace_back(source, credential, password);
+    else
+        std::cout << "Entry already exists for " << source << "\n";
 }
 
 void Vault::viewAllEntries() const
@@ -26,7 +29,7 @@ void Vault::viewAllEntries() const
     }
 }
 
-bool Vault::searchPassword(std::string_view source) const
+bool Vault::searchSource(std::string_view source) const
 {
     bool found{ false };
     for(const PasswordEntry& p : m_vault)
