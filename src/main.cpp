@@ -74,6 +74,7 @@ int main()
     myVault.deleteEntry("poolhouse.com");
 
     std::cout << "\n\n";
+    myVault.updateEntry("gubzywubzy.com");
     myVault.viewAllEntries();
 
     myVault.saveToFile();

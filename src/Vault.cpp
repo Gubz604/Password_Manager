@@ -29,6 +29,48 @@ void Vault::deleteEntry(std::string_view source)
         m_vault.erase(it);
 }
 
+void Vault::updateEntry(std::string_view source) 
+{
+    auto it = findBySource(source);
+    PasswordEntry& entry = *it;
+
+    if (it != m_vault.end())
+    {
+        while(true)
+        {
+            std::cout 
+                << "Update credential or password?\n"
+                << "Enter 'c' for credential\n"
+                << "Enter 'p' for password\n"
+                << "Enter 'q' to return to menu\n";
+            
+
+            char choice = getChoice();
+
+            if (choice == 'q') break;
+
+            if (choice == 'c')
+            {
+                std::cout << "Current Credential is: " << entry.credential << "\n";
+                std::cout << "Enter what you want the Credential to be updated to\nCAUTION CHANGES ARE PERMANENT\n> ";
+                std::getline(std::cin >> std::ws, entry.credential);
+            }
+
+            if (choice == 'p')
+            {
+                std::cout << "Current Password is: " << entry.password << "\n";
+                std::cout << "Enter what you want the Credential to be updated to\nCAUTION CHANGES ARE PERMANENT\n> ";
+                std::getline(std::cin >> std::ws, entry.password);
+            }
+        }
+    }
+    else 
+    {
+        std::cout << "No source/site matches in the vault.\n";
+        return;
+    }
+}
+
 void Vault::printEntry(std::string_view source) const
 {
     auto it = findBySource(source);
@@ -108,4 +150,35 @@ Vault::findBySource(std::string_view source) const
         {
             return p.source == source;
         });
+}
+
+char Vault::getChoice()
+{
+    while(true)
+    {
+        std::cout << "> ";
+
+        std::string line;
+        std::getline(std::cin, line);
+
+        if (!std::cin) return 'q';
+
+        if (line.empty())
+        {
+            std::cout << "Please enter a choice: | c | p | q |\n";
+            continue;
+        }
+
+        if (line.size() != 1)
+        {
+            std::cout << "Please enter a single character.\n";
+            continue;
+        }
+
+        char c = static_cast<char>(std::tolower(static_cast<unsigned char>(line[0])));
+        if (c == 'c' || c == 'p' || c == 'q')
+            return c;
+
+        std::cout << "Invalid input. Try again\n";
+    }
 }

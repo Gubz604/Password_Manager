@@ -24,6 +24,8 @@ class Vault
 
     void deleteEntry(std::string_view source);
 
+    void updateEntry(std::string_view source);
+
     void printEntry(std::string_view source) const;
 
     void viewAllEntries() const;
@@ -36,6 +38,8 @@ class Vault
     std::vector<PasswordEntry>::const_iterator findBySource(std::string_view source) const;
 
     std::vector<PasswordEntry>::iterator findBySource(std::string_view source);
+
+    char getChoice();
 };
 
 #endif 
