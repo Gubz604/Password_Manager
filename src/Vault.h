@@ -22,14 +22,20 @@ class Vault
 
     void addEntry(std::string_view source, std::string_view credential, std::string_view password);
 
-    void viewAllEntries() const;
+    void deleteEntry(std::string_view source);
 
-    bool searchSource(std::string_view source) const;
+    void printEntry(std::string_view source) const;
+
+    void viewAllEntries() const;
 
     void saveToFile() const;
 
     private:
     void loadFile(const fs::path& filePath);
+
+    std::vector<PasswordEntry>::const_iterator findBySource(std::string_view source) const;
+
+    std::vector<PasswordEntry>::iterator findBySource(std::string_view source);
 };
 
 #endif 

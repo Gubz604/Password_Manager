@@ -15,10 +15,28 @@ Vault::Vault(std::string_view masterPassword, const fs::path& filePath)
 
 void Vault::addEntry(std::string_view source, std::string_view credential, std::string_view password)
 {
-    if (!searchSource(source))
+    auto it = findBySource(source);
+
+    if (it == m_vault.end())
         m_vault.emplace_back(source, credential, password);
+}
+
+void Vault::deleteEntry(std::string_view source)
+{
+    auto it = findBySource(source);
+
+    if (it != m_vault.end())
+        m_vault.erase(it);
+}
+
+void Vault::printEntry(std::string_view source) const
+{
+    auto it = findBySource(source);
+
+    if (it != m_vault.end())
+        std::cout << "Found:\n" << *it << "\n";
     else
-        std::cout << "Entry already exists for " << source << "\n";
+        std::cout << "No source/site matches in the vault.\n";
 }
 
 void Vault::viewAllEntries() const
@@ -27,23 +45,6 @@ void Vault::viewAllEntries() const
     {
         std::cout << p << "\n";
     }
-}
-
-bool Vault::searchSource(std::string_view source) const
-{
-    bool found{ false };
-    for(const PasswordEntry& p : m_vault)
-    {
-        if (p.source == source)
-        {
-            std::cout << "Found:\n";
-            std::cout << p << "\n";
-            found = true;
-        }
-    }
-    if (!found) std::cout << "No source/site matches in the vault.\n";
-
-    return found;
 }
 
 void Vault::saveToFile() const
@@ -87,4 +88,24 @@ void Vault::loadFile(const fs::path& filePath)
         m_vault.emplace_back(source, credential, password);
     }
     file.close();
+}
+
+std::vector<PasswordEntry>::iterator
+Vault::findBySource(std::string_view source)
+{
+    return std::find_if(m_vault.begin(), m_vault.end(),
+        [&](const PasswordEntry& p)
+        {
+            return p.source == source;
+        });
+}
+
+std::vector<PasswordEntry>::const_iterator
+Vault::findBySource(std::string_view source) const
+{
+    return std::find_if(m_vault.begin(), m_vault.end(),
+        [&](const PasswordEntry& p)
+        {
+            return p.source == source;
+        });
 }

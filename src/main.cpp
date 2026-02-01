@@ -68,8 +68,13 @@ int main()
     myVault.viewAllEntries();
 
     std::cout << "\n\n";
-    myVault.searchSource("gubzywubzy.com");
-    myVault.searchSource("LosPollosHermanos.com");
+    myVault.printEntry("gubzywubzy.com");
+    myVault.printEntry("LosPollosHermanos.com");
+
+    myVault.deleteEntry("poolhouse.com");
+
+    std::cout << "\n\n";
+    myVault.viewAllEntries();
 
     myVault.saveToFile();
 }
