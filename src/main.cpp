@@ -1,5 +1,7 @@
 #include "Vault.h"
+#include "fileIOHandler.h"
 
+#include <limits>
 #include <vector>
 #include <filesystem> 
 #include <fstream>
@@ -8,74 +10,95 @@ namespace fs = std::filesystem;
 
 int main()
 {
-    // std::cout << fs::current_path() << "\n"; // Check what the working directory is
+    fileIOHandler fileIOH{};
 
-    fs::path dir = "vault";
-    fs::path file = dir / "vault.txt";
-
-    // In case something named "vault" exists but it's not a directory
-    if (fs::exists(dir) && !fs::is_directory(dir))
-    {
-        std::cerr <<  dir << " exists but is not a directory.\n";
+    if (!fileIOH.checkNameCollision())
         return 1;
-    }
 
-    // Check if directory does not exist
-    if (!fs::exists(dir)) 
+    std::cout << "---------------------------------------------------------------------------\n";
+    std::cout << "\t\t\tWelcome to Password Manager\n";
+    std::cout << "---------------------------------------------------------------------------\n";
+
+    // Check if the directory does not exist
+    if (!fileIOH.checkDirectoryExists()) 
     {
         // Create the directory
-        if (fs::create_directories(dir))
+        if (fileIOH.createDirectory())
         {
-            std::cout << "Created directory: " << dir << "\n";
-            std::ofstream f(file);  // Create the file
-            if (!f)
-            {
-                std::cerr << "Failed to create a file\n";
-                return 1;
-            }
-            f << "source,credential,password\n";
+            std::cout << "Created directory: /" << fileIOH.getDirectory() << " in:\n" << fs::current_path() << "\n\n";
         }
         else 
         {
-            std::cerr << "Failed to create directory: " << dir << "\n";
+            std::cerr << "Failed to create directory: /" << fileIOH.getDirectory() << "\n";
+            return 1;
         }
     }
-    else // The directory does exist
+    else 
     {
-        // Check if the file exists
-        if (!fs::exists(file)) 
-        {
-            // Create file
-            std::ofstream f(file);
-            if (!f)
-            {
-                std::cerr << "Failed to create a file\n";
-                return 1;
-            }
-            f << "source,credential,password\n";
-            std::cout << "File created\n";
-        }
-        else
-        {
-            std::cout << "File already exists\n";
-        }
+        std::cout << "Directory: /" << fileIOH.getDirectory() << " found!\n\n";
     }
 
-    Vault myVault{ "masterpass", file };
+    while(true) 
+    {
+        fileIOH.showFiles();
 
-    myVault.addEntry("gubzywubzy.com", "Gurvir", "password");
-    myVault.addEntry("poolhouse.com", "gubz", "pass1");
-    myVault.viewAllEntries();
+        std::cout 
+            << "Choose an existing vault (e) or create a new vault (c)\n"
+            << "Enter 'e' to choose an existing vault\n"
+            << "Enter 'c' to create a new\n"
+            << "Enter 'q' to create quit the program\n";
+        char choice{ fileIOH.chooseExistingOrCreateNew() };
 
-    std::cout << "\n\n";
-    myVault.printEntry("gubzywubzy.com");
-    myVault.printEntry("LosPollosHermanos.com");
+        if (choice == 'q')
+        {
+            std::cout << "Goodbye!\n";
+            return 0;
+        }
 
-    myVault.deleteEntry("poolhouse.com");
+        std::string fileName{};
+        if (choice == 'e')
+        {
+            std::cout << "Enter the EXACT name of the vault you want to enter:\n> ";
+            std::cin >> fileName;
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // flushes newline so emptyLine check doesnt trigger
+            if (!fileIOH.checkPathExists(fileName))
+            {
+                std::cout << "Vault does not exist in directory\n";
+                continue;
+            }
+        }
 
-    std::cout << "\n\n";
-    myVault.updateEntry("gubzywubzy.com");
-    myVault.viewAllEntries();
+        if (choice == 'c')
+        {
+            std::cout << "Enter the name of the new vault (e.g. Personal, Work)\n> ";
+            std::cin >> fileName;
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // flushes newline so emptyLine check doesnt trigger
+            if (fileIOH.checkPathExists(fileName))
+            {
+                std::cout << "Vault already exists with that name\n";
+                continue;
+            }
+        }
 
-    myVault.saveToFile();
+        fs::path dir = fs::path(fileIOH.getDirectory());
+
+        // strip quotes from input if they're put there
+        if (fileName.size() >= 2 && fileName.front() == '"' && fileName.back() == '"')
+        {
+            fileName = fileName.substr(1, fileName.size() - 2);
+        }
+
+        fs::path name = fs::path(fileName);
+
+        // Adds extension if not already given
+        if (name.extension() != ".txt")
+            name += ".txt";
+        
+        fs::path fullPath = dir / name;
+
+        Vault currentVault{ fullPath };
+        currentVault.vaultMenu();
+
+        break;
+    }
 }

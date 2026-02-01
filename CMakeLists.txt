@@ -12,6 +12,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_executable(vault
     src/main.cpp
     src/Vault.cpp
+    src/fileIOHandler.cpp
 )
 
 target_include_directories(vault PRIVATE

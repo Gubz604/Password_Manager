@@ -1,0 +1,4 @@
+source,credential,password
+netflix,gubzalicious,pass4
+neopets,gubzz,passs33333
+naruto.com,gubzywubzy@gmail.com,passssssssss

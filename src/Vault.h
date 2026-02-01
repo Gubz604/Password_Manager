@@ -3,6 +3,7 @@
 
 #include "PasswordEntry.h"
 
+#include <optional>
 #include <filesystem>
 #include <fstream>
 #include <string_view>
@@ -18,17 +19,19 @@ class Vault
         const fs::path& m_filePath{};
 
     public:
-        Vault(std::string_view masterPassword, const fs::path& filePath);
+        Vault(const fs::path& filePath, std::string_view masterPassword="default");
 
-    void addEntry(std::string_view source, std::string_view credential, std::string_view password);
+    void addEntry();
 
-    void deleteEntry(std::string_view source);
+    void deleteEntry();
 
-    void updateEntry(std::string_view source);
+    void updateEntry();
 
     void printEntry(std::string_view source) const;
 
     void viewAllEntries() const;
+
+    void vaultMenu();
 
     void saveToFile() const;
 
@@ -39,7 +42,11 @@ class Vault
 
     std::vector<PasswordEntry>::iterator findBySource(std::string_view source);
 
-    char getChoice();
+    char getChoiceUpdate();
+
+    int getChoiceMenu();
+
+    std::string getChoiceEntryValue() const;
 };
 
 #endif 
