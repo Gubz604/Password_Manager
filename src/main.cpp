@@ -67,5 +67,9 @@ int main()
     myVault.addEntry("poolhouse.com", "gubz", "pass1");
     myVault.viewAllEntries();
 
+    std::cout << "\n\n";
+    myVault.searchPassword("gubzywubzy.com");
+    myVault.searchPassword("LosPollosHermanos.com");
+
     myVault.saveToFile();
 }

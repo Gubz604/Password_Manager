@@ -1,5 +1,6 @@
 #include "Vault.h"
 
+#include <algorithm>
 #include <iostream>
 
 namespace fs = std::filesystem;
@@ -23,6 +24,23 @@ void Vault::viewAllEntries() const
     {
         std::cout << p << "\n";
     }
+}
+
+bool Vault::searchPassword(std::string_view source) const
+{
+    bool found{ false };
+    for(const PasswordEntry& p : m_vault)
+    {
+        if (p.source == source)
+        {
+            std::cout << "Found:\n";
+            std::cout << p << "\n";
+            found = true;
+        }
+    }
+    if (!found) std::cout << "No source/site matches in the vault.\n";
+
+    return found;
 }
 
 void Vault::saveToFile() const
