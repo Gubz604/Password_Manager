@@ -1,5 +1,8 @@
 #include "Vault.h"
+#include "Crypto.h"
 
+#include <fstream>
+#include <sstream>
 #include <algorithm>
 #include <iostream>
 
@@ -10,7 +13,7 @@ Vault::Vault(const fs::path& filePath, std::string_view masterPassword)
     , m_masterPassword{ masterPassword }
     , m_filePath{ filePath }
 {
-    loadFile(filePath);
+    loadFile(m_filePath);
 }
 
 void Vault::addEntry()
@@ -50,6 +53,12 @@ void Vault::updateEntry()
     std::cout << "Enter the name of the source/site:\n";
     std::string source{ getChoiceEntryValue() };
     auto it = findBySource(source);
+    if (it == m_vault.end())
+    {
+        std::cout << "No source/site mathes in the vault.\n";
+        return;
+    }
+
     PasswordEntry& entry = *it;
 
     if (it != m_vault.end())
@@ -81,11 +90,6 @@ void Vault::updateEntry()
                 std::getline(std::cin >> std::ws, entry.password);
             }
         }
-    }
-    else 
-    {
-        std::cout << "No source/site matches in the vault.\n";
-        return;
     }
 }
 
@@ -151,28 +155,81 @@ void Vault::saveToFile() const
 {
     std::cout << "SAVING TO: " << fs::absolute(m_filePath) << "\n";
 
-    std::ofstream file(m_filePath);
-    file << "source,credential,password\n";
-    for (const PasswordEntry& p : m_vault) 
+    std::ostringstream oss;
+    oss << "source,credential,password\n";
+    for (const PasswordEntry& p : m_vault)
+        oss << p.source << "," << p.credential << "," << p.password << "\n";
+    
+    const std::string csv = oss.str();
+
+    // Encrypt
+    const auto blob = crypto::encryptVault(
+        std::vector<std::uint8_t>(csv.begin(), csv.end()),
+        m_masterPassword
+    );
+
+    // Write encrypted bytes as binary
+    std::ofstream file(m_filePath, std::ios::binary);
+    if (!file)
     {
-        file << p.source << "," << p.credential << "," << p.password << "\n";
+        std::cerr << "Failed to open file for writing: " << m_filePath << "\n";
+        return;
     }
-    file.close();
+
+    file.write(reinterpret_cast<const char*>(blob.data()),
+                static_cast<std::streamsize>(blob.size()));
+
+    if (!file)
+        std::cerr << "Write failed: " << m_filePath << "\n";
 }
 
 void Vault::loadFile(const fs::path& filePath) 
 {
-
-    std::ifstream file(filePath);
-    if (!file) 
+    std::ifstream file(filePath, std::ios::binary);
+    if (!file)
     {
-        std::cerr << "Failed to open file for reading--loadFile failed: " << filePath << "\n";
+        std::cerr << "Failed to open file for reading -- loadFile failed: " << filePath << "\n";
         return;
     }
 
+    // Read whole file into blob
+    file.seekg(0, std::ios::end);
+    std::streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    if (size <= 0)
+    {
+        // Empty vault file is fine - treat as no entries
+        return;
+    }
+
+    std::vector<std::uint8_t> blob(static_cast<std::size_t>(size));
+    if (!file.read(reinterpret_cast<char*>(blob.data()), size))
+    {
+        std::cerr << "Failed to read vault file: " << filePath << "\n";
+        return;
+    }
+
+    // Decrypt
+    std::string csv;
+    try
+    {
+        const auto plaintext = crypto::decryptVault(blob, m_masterPassword);
+        csv.assign(plaintext.begin(), plaintext.end());
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Vault decrypt failed: " << e.what() << "\n";
+        return;
+    }
+
+    // Parse CSV 
+    std::istringstream iss(csv);
+
     std::string line;
-    std::getline(file, line); // Skips the header
-    while (std::getline(file, line))
+    std::getline(iss, line); // skip header
+
+    while (std::getline(iss, line))
     {
         if (line.empty()) continue;
 
@@ -180,9 +237,7 @@ void Vault::loadFile(const fs::path& filePath)
         std::size_t c2 = line.find(',', c1 + 1);
 
         if (c1 == std::string::npos || c2 == std::string::npos)
-        {
             continue;
-        }
 
         std::string source{ line.substr(0, c1) };
         std::string credential{ line.substr(c1 + 1, c2 - (c1 + 1)) };
@@ -190,7 +245,6 @@ void Vault::loadFile(const fs::path& filePath)
 
         m_vault.emplace_back(source, credential, password);
     }
-    file.close();
 }
 
 std::vector<PasswordEntry>::iterator

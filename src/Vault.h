@@ -3,9 +3,7 @@
 
 #include "PasswordEntry.h"
 
-#include <optional>
 #include <filesystem>
-#include <fstream>
 #include <string_view>
 #include <vector>
 
@@ -16,7 +14,7 @@ class Vault
     private:
         std::vector<PasswordEntry> m_vault{};
         std::string m_masterPassword{};
-        const fs::path& m_filePath{};
+        fs::path m_filePath{};
 
     public:
         Vault(const fs::path& filePath, std::string_view masterPassword="default");

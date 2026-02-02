@@ -5,8 +5,18 @@
 #include <vector>
 #include <filesystem> 
 #include <fstream>
+#include <iostream>
 
 namespace fs = std::filesystem;
+
+static std::string promptMasterPassword(const std::string& vaultName)
+{
+    std::cout << "Enter master password for " << vaultName << ":\n> ";
+    std::string pw;
+    std::getline(std::cin, pw);
+    return pw;
+}
+
 
 int main()
 {
@@ -91,14 +101,15 @@ int main()
         fs::path name = fs::path(fileName);
 
         // Adds extension if not already given
-        if (name.extension() != ".txt")
-            name += ".txt";
+        if (name.extension() != ".vlt")
+            name += ".vlt";
         
         fs::path fullPath = dir / name;
 
-        Vault currentVault{ fullPath };
+        std::string master{ promptMasterPassword(fullPath.filename().string()) };
+        Vault currentVault{ fullPath, master };
         currentVault.vaultMenu();
-
-        break;
     }
+
+    return 0;
 }

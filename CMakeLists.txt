@@ -13,6 +13,7 @@ add_executable(vault
     src/main.cpp
     src/Vault.cpp
     src/fileIOHandler.cpp
+    src/Crypto.cpp
 )
 
 target_include_directories(vault PRIVATE
@@ -25,3 +26,12 @@ if (MSVC)
 else()
     target_compile_options(vault PRIVATE -Wall -Wextra -Wpedantic)
 endif()
+
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(SODIUM REQUIRED libsodium)
+
+target_include_directories(vault PRIVATE ${SODIUM_INCLUDE_DIRS})
+target_link_directories(vault PRIVATE ${SODIUM_LIBRARY_DIRS})
+target_link_libraries(vault PRIVATE ${SODIUM_LIBRARIES})
+target_compile_options(vault PRIVATE ${SODIUM_CFLAGS_OTHER})

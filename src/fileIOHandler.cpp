@@ -36,13 +36,9 @@ bool fileIOHandler::checkFileExists(const fs::path& file) const { return fs::exi
 
 void fileIOHandler::createFile(const fs::path& file)
 {
-    std::ofstream f(file);  // Create the file
-                if (!f)
-                {
-                    std::cerr << "Failed to create a file\n";
-                    return;
-                }
-                f << "source,credential,password\n";
+    std::ofstream f(file, std::ios::binary); // create empty file
+    if (!f)
+        std::cerr << "Failed to create a file\n";
 }
 
 void fileIOHandler::showFiles() const
