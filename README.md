@@ -30,4 +30,4 @@ A secure, lightweight **console-based password manager written in modern C++** t
 - Secure file handling using `std::fstream`
 - Custom encryption and decryption layer
 - Input validation and error handling
-- STL usage (`std::vector`, `std::string`, `std::optional`)
+- STL usage (`std::vector`, `std::string`)
